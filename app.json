@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "Relationship Tracker",
+    "slug": "relationship-tracker",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourname.relationshiptracker",
+      "infoPlist": {
+        "NSContactsUsageDescription": "This app needs access to your contacts to help you track when you last connected with friends and family."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-sqlite"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "df397484-589a-48bc-ba86-b55a836fcf89"
+      }
+    },
+    "owner": "ellajane-0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/df397484-589a-48bc-ba86-b55a836fcf89"
+    }
+  }
+}
