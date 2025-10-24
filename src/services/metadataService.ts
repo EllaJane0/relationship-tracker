@@ -65,16 +65,22 @@ export async function extractMetadata(url: string): Promise<ProductMetadata> {
 
   try {
     // Determine API endpoint URL
-    // In local development, use localhost:3001
-    // In production (Vercel), use the serverless function
-    const apiUrl = process.env.EXPO_PUBLIC_APP_URL
-      ? `${process.env.EXPO_PUBLIC_APP_URL}/api/extract-metadata`
-      : 'http://localhost:3001'; // Local metadata server
+    // Check if we're in production by looking at the window location
+    const isProduction = typeof window !== 'undefined' &&
+                        !window.location.hostname.includes('localhost') &&
+                        !window.location.hostname.includes('127.0.0.1');
+
+    const apiUrl = isProduction
+      ? '/api/extract-metadata'  // Relative URL in production (Vercel)
+      : (process.env.EXPO_PUBLIC_APP_URL
+          ? `${process.env.EXPO_PUBLIC_APP_URL}/api/extract-metadata`
+          : 'http://localhost:3001'); // Local metadata server
 
     // Create abort controller for timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout for real fetching
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
+    console.log(`Environment: ${isProduction ? 'Production' : 'Development'}`);
     console.log(`Fetching metadata from: ${apiUrl}`);
 
     // Call the metadata extraction API
@@ -89,8 +95,16 @@ export async function extractMetadata(url: string): Promise<ProductMetadata> {
 
     clearTimeout(timeoutId);
 
+    console.log('Response status:', response.status);
+    console.log('Response headers:', response.headers.get('content-type'));
+
     if (!response.ok) {
-      console.warn('Metadata extraction failed:', response.status);
+      const errorText = await response.text();
+      console.error('Metadata extraction failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText
+      });
       return {
         title: null,
         imageUrl: null,
@@ -101,9 +115,14 @@ export async function extractMetadata(url: string): Promise<ProductMetadata> {
     }
 
     const data = await response.json();
+    console.log('Metadata response:', data);
 
     if (data.success && data.metadata) {
-      console.log('Metadata extracted successfully:', data.metadata.title);
+      console.log('Metadata extracted successfully:', {
+        title: data.metadata.title,
+        hasImage: !!data.metadata.imageUrl,
+        hasPrice: !!data.metadata.price
+      });
       return {
         title: data.metadata.title,
         imageUrl: data.metadata.imageUrl,
@@ -113,6 +132,7 @@ export async function extractMetadata(url: string): Promise<ProductMetadata> {
       };
     }
 
+    console.warn('Metadata extraction unsuccessful:', data);
     return {
       title: null,
       imageUrl: null,
@@ -123,9 +143,13 @@ export async function extractMetadata(url: string): Promise<ProductMetadata> {
   } catch (error: any) {
     // Handle timeout or other errors
     if (error.name === 'AbortError') {
-      console.warn('Metadata extraction timeout');
+      console.warn('Metadata extraction timeout after 10 seconds');
     } else {
-      console.error('Metadata extraction error:', error.message);
+      console.error('Metadata extraction error:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
     }
 
     return {
