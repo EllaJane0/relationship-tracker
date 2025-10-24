@@ -57,6 +57,82 @@ function extractOGTag(html: string, property: string): string | null {
 }
 
 /**
+ * Extract Amazon-specific product title
+ * @param html - HTML content to parse
+ * @returns Product title or null
+ */
+function extractAmazonTitle(html: string): string | null {
+  try {
+    // Try id="productTitle" element
+    const productTitleRegex = /<span[^>]*id=["']productTitle["'][^>]*>([^<]+)<\/span>/i;
+    const match = html.match(productTitleRegex);
+    if (match && match[1]) {
+      return match[1].trim();
+    }
+
+    // Try from JSON-LD Product schema
+    const jsonLdRegex = /<script[^>]*type=["']application\/ld\+json["'][^>]*>(.*?)<\/script>/gis;
+    const jsonLdMatches = html.matchAll(jsonLdRegex);
+
+    for (const jsonMatch of jsonLdMatches) {
+      try {
+        const data = JSON.parse(jsonMatch[1]);
+        if (data['@type'] === 'Product' && data.name) {
+          return data.name;
+        }
+      } catch (e) {
+        // Continue to next JSON-LD block
+      }
+    }
+
+    return null;
+  } catch (error) {
+    return null;
+  }
+}
+
+/**
+ * Extract Amazon-specific product image
+ * @param html - HTML content to parse
+ * @returns Image URL or null
+ */
+function extractAmazonImage(html: string): string | null {
+  try {
+    // Try from JSON-LD Product schema
+    const jsonLdRegex = /<script[^>]*type=["']application\/ld\+json["'][^>]*>(.*?)<\/script>/gis;
+    const jsonLdMatches = html.matchAll(jsonLdRegex);
+
+    for (const jsonMatch of jsonLdMatches) {
+      try {
+        const data = JSON.parse(jsonMatch[1]);
+        if (data['@type'] === 'Product' && data.image) {
+          // Handle both string and array
+          const image = Array.isArray(data.image) ? data.image[0] : data.image;
+          if (typeof image === 'string') {
+            return image;
+          } else if (image && image.url) {
+            return image.url;
+          }
+        }
+      } catch (e) {
+        // Continue to next JSON-LD block
+      }
+    }
+
+    // Try main image element
+    const mainImageRegex = /<img[^>]*id=["']landingImage["'][^>]*src=["']([^"']+)["']/i;
+    const match = html.match(mainImageRegex);
+    if (match && match[1]) {
+      return match[1];
+    }
+
+    return null;
+  } catch (error) {
+    return null;
+  }
+}
+
+/**
  * Extract standard HTML tag content
  * @param html - HTML content to parse
  * @param tag - HTML tag name (e.g., 'title')
@@ -194,10 +270,30 @@ export default async function handler(
 
     const html = await response.text();
 
-    // Extract metadata from HTML
+    // Check if this is an Amazon URL
+    const isAmazon = url.includes('amazon.com') || url.includes('amazon.');
+
+    // Extract metadata from HTML with Amazon-specific handling
+    let title = null;
+    let imageUrl = null;
+
+    if (isAmazon) {
+      // Try Amazon-specific extraction first
+      title = extractAmazonTitle(html);
+      imageUrl = extractAmazonImage(html);
+    }
+
+    // Fall back to general extraction if Amazon-specific failed
+    if (!title) {
+      title = extractOGTag(html, 'og:title') || extractTag(html, 'title');
+    }
+    if (!imageUrl) {
+      imageUrl = extractOGTag(html, 'og:image');
+    }
+
     const metadata = {
-      title: extractOGTag(html, 'og:title') || extractTag(html, 'title'),
-      imageUrl: extractOGTag(html, 'og:image'),
+      title,
+      imageUrl,
       price: extractPrice(html),
       description: extractOGTag(html, 'og:description') || extractTag(html, 'meta[name="description"]'),
     };
