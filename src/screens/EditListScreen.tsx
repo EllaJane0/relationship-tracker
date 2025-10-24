@@ -162,19 +162,6 @@ export function EditListScreen() {
 
     return (
       <View key={item.id} style={styles.itemCard}>
-        {/* Item Image */}
-        {item.imageUrl ? (
-          <Image
-            source={{ uri: item.imageUrl }}
-            style={styles.itemImage}
-            resizeMode="cover"
-          />
-        ) : (
-          <View style={[styles.itemImage, styles.placeholderImage]}>
-            <Ionicons name="gift-outline" size={32} color={theme.colors.textSecondary} />
-          </View>
-        )}
-
         {/* Item Details */}
         <View style={styles.itemDetails}>
           {/* Title */}
@@ -184,11 +171,6 @@ export function EditListScreen() {
             </Text>
           ) : (
             <Text style={styles.itemTitlePlaceholder}>Loading product details...</Text>
-          )}
-
-          {/* Price */}
-          {item.price !== null && (
-            <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
           )}
 
           {/* Product Link - Clickable */}
@@ -416,18 +398,6 @@ const styles = StyleSheet.create({
     padding: theme.spacing.md,
     marginBottom: theme.spacing.md,
     ...theme.shadows.small,
-    flexDirection: 'row',
-    gap: theme.spacing.md,
-  },
-  itemImage: {
-    width: 100,
-    height: 100,
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: theme.colors.background,
-  },
-  placeholderImage: {
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   itemDetails: {
     flex: 1,
@@ -440,11 +410,6 @@ const styles = StyleSheet.create({
     ...theme.typography.body,
     color: theme.colors.textSecondary,
     fontStyle: 'italic',
-    marginBottom: theme.spacing.xs,
-  },
-  itemPrice: {
-    ...theme.typography.headline,
-    color: theme.colors.primary,
     marginBottom: theme.spacing.xs,
   },
   itemUrl: {
