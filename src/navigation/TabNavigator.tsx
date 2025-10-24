@@ -12,7 +12,8 @@ import { theme } from '../styles/theme';
 
 // Import screens
 import { HomeScreen } from '../screens/HomeScreen';
-import { ContactsScreen } from '../screens/ContactsScreen';
+import { MyListsScreen } from '../screens/MyListsScreen';
+import { DashboardScreen } from '../screens/DashboardScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 
 /**
@@ -85,16 +86,33 @@ export function TabNavigator() {
         }}
       />
 
-      {/* Contacts Tab */}
+      {/* My Lists Tab */}
       <Tab.Screen
-        name="Contacts"
-        component={ContactsScreen}
+        name="MyLists"
+        component={MyListsScreen}
         options={{
-          title: 'Contacts',
-          tabBarLabel: 'Contacts',
+          title: 'My Lists',
+          tabBarLabel: 'My Lists',
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
-              name={focused ? 'people' : 'people-outline'}
+              name={focused ? 'list' : 'list-outline'}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+
+      {/* Dashboard Tab */}
+      <Tab.Screen
+        name="Dashboard"
+        component={DashboardScreen}
+        options={{
+          title: 'Dashboard',
+          tabBarLabel: 'Dashboard',
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? 'albums' : 'albums-outline'}
               size={size}
               color={color}
             />

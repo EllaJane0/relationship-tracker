@@ -12,6 +12,10 @@ import { LoginScreen } from '../screens/LoginScreen';
 import { SignUpScreen } from '../screens/SignUpScreen';
 import { ForgotPasswordScreen } from '../screens/ForgotPasswordScreen';
 import { SubscriptionScreen } from '../screens/SubscriptionScreen';
+import { CreateListScreen } from '../screens/CreateListScreen';
+import { EditListScreen } from '../screens/EditListScreen';
+import { ListDetailScreen } from '../screens/ListDetailScreen';
+import { SharedListViewScreen } from '../screens/SharedListViewScreen';
 import { theme } from '../styles/theme';
 
 const Stack = createNativeStackNavigator();
@@ -33,6 +37,39 @@ export function RootNavigator() {
         // User is signed in - show main app
         <>
           <Stack.Screen name="Main" component={TabNavigator} />
+          <Stack.Screen
+            name="CreateList"
+            component={CreateListScreen}
+            options={{
+              headerShown: true,
+              title: 'Create List',
+              presentation: 'modal'
+            }}
+          />
+          <Stack.Screen
+            name="EditList"
+            component={EditListScreen}
+            options={{
+              headerShown: true,
+              title: 'Edit List'
+            }}
+          />
+          <Stack.Screen
+            name="ListDetail"
+            component={ListDetailScreen}
+            options={{
+              headerShown: true,
+              title: 'List Details'
+            }}
+          />
+          <Stack.Screen
+            name="SharedListView"
+            component={SharedListViewScreen}
+            options={{
+              headerShown: true,
+              title: 'Shared List'
+            }}
+          />
           <Stack.Screen
             name="Subscription"
             component={SubscriptionScreen}

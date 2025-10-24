@@ -7,38 +7,50 @@
 export const theme = {
   /**
    * Color Palette
-   * Uses iOS system colors for a native feel
+   * Christmas-themed colors for festive feel
    */
   colors: {
-    /** Primary action color - iOS blue */
-    primary: '#007AFF',
+    /** Primary action color - Christmas red */
+    primary: '#C41E3A',
 
-    /** Main background color */
-    background: '#FFFFFF',
+    /** Main background color - Light cream/snow */
+    background: '#FFF9F0',
 
-    /** Secondary background for grouped content */
-    secondaryBackground: '#F2F2F7',
+    /** Card background color - Pure white like snow */
+    cardBackground: '#FFFFFF',
 
-    /** Primary text color */
-    text: '#000000',
+    /** Secondary background for grouped content - Light cream */
+    secondaryBackground: '#FFF9F0',
 
-    /** Secondary/subtle text color */
-    secondaryText: '#8E8E93',
+    /** Primary text color - Dark green */
+    text: '#0F3D0F',
 
-    /** Border and separator color */
-    border: '#C6C6C8',
+    /** Secondary/subtle text color - Medium gray */
+    textSecondary: '#6B7280',
 
-    /** Error and destructive action color */
-    error: '#FF3B30',
+    /** Alternate for backwards compatibility */
+    secondaryText: '#6B7280',
 
-    /** Success and positive action color */
-    success: '#34C759',
+    /** Border and separator color - Light gold */
+    border: '#E5D5B7',
 
-    /** Warning color */
-    warning: '#FF9500',
+    /** Error and destructive action color - Christmas red */
+    error: '#C41E3A',
+
+    /** Success and positive action color - Christmas green */
+    success: '#165B33',
+
+    /** Warning color - Gold */
+    warning: '#D4AF37',
 
     /** Disabled state color */
     disabled: '#D1D1D6',
+
+    /** Accent color - Christmas green */
+    accent: '#165B33',
+
+    /** Gold accent for special elements */
+    gold: '#D4AF37',
   },
 
   /**
@@ -119,6 +131,39 @@ export const theme = {
 
     /** Extra large radius - 20px */
     xl: 20,
+  },
+
+  /**
+   * Shadow Styles
+   * Elevation and depth effects for cards and elevated UI
+   */
+  shadows: {
+    /** Small shadow for subtle elevation */
+    small: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+
+    /** Medium shadow for standard elevation */
+    medium: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+
+    /** Large shadow for prominent elevation */
+    large: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.2,
+      shadowRadius: 16,
+      elevation: 8,
+    },
   },
 } as const;
 

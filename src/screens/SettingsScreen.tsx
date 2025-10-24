@@ -47,11 +47,11 @@ export function SettingsScreen({ navigation }: SettingsScreenProps) {
           style={styles.upgradeCard}
           onPress={() => (navigation as any).navigate('Subscription')}
         >
-          <Text style={styles.upgradeEmoji}>⭐</Text>
+          <Text style={styles.upgradeEmoji}>🎁</Text>
           <View style={styles.upgradeTextContainer}>
             <Text style={styles.upgradeTitle}>Upgrade to Pro</Text>
             <Text style={styles.upgradeSubtitle}>
-              Unlock premium features for $4.99/month
+              Create unlimited lists & advanced features for $4.99/month
             </Text>
           </View>
           <Text style={styles.upgradeArrow}>→</Text>
@@ -93,20 +93,20 @@ export function SettingsScreen({ navigation }: SettingsScreenProps) {
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Coming Soon</Text>
           <Text style={styles.comingSoonText}>
-            More settings and preferences will be available in future updates:
+            More features coming in future updates:
           </Text>
           <View style={styles.featureList}>
-            <Text style={styles.featureItem}>• Notification settings</Text>
-            <Text style={styles.featureItem}>• Reminder frequency</Text>
-            <Text style={styles.featureItem}>• Privacy controls</Text>
-            <Text style={styles.featureItem}>• Contact grouping</Text>
+            <Text style={styles.featureItem}>• Item claiming (mark as purchased)</Text>
+            <Text style={styles.featureItem}>• Price tracking & alerts</Text>
+            <Text style={styles.featureItem}>• List categories & tags</Text>
+            <Text style={styles.featureItem}>• Collaborative lists</Text>
             <Text style={styles.featureItem}>• Dark mode</Text>
           </View>
         </View>
 
         {/* Footer */}
         <Text style={styles.footer}>
-          Made with ❤️ for staying connected
+          Made with 🎄 for joyful gift giving
         </Text>
       </ScrollView>
     </SafeAreaView>

@@ -30,9 +30,9 @@ export const ErrorMessages = {
  * Basic app metadata
  */
 export const AppInfo = {
-  NAME: 'Relationship Tracker',
+  NAME: 'Christmas List Sharer',
   VERSION: '1.0.0',
-  DESCRIPTION: 'Keep track of when you last connected with friends and family',
+  DESCRIPTION: 'Create and share wish lists with friends and family',
 } as const;
 
 /**

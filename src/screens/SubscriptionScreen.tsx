@@ -98,9 +98,9 @@ export function SubscriptionScreen({ navigation }: any) {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <Text style={styles.title}>Upgrade to Pro</Text>
+        <Text style={styles.title}>🎁 Upgrade to Pro</Text>
         <Text style={styles.subtitle}>
-          Get unlimited access to all premium features
+          Unlock unlimited lists and advanced gift-sharing features
         </Text>
 
         {/* Pricing Card */}
@@ -110,11 +110,12 @@ export function SubscriptionScreen({ navigation }: any) {
 
           <View style={styles.features}>
             <Text style={styles.featureTitle}>Premium Features:</Text>
-            <Text style={styles.feature}>✓ Unlimited contacts</Text>
-            <Text style={styles.feature}>✓ Custom reminders</Text>
-            <Text style={styles.feature}>✓ Advanced analytics</Text>
+            <Text style={styles.feature}>✓ Unlimited wish lists</Text>
+            <Text style={styles.feature}>✓ Priority metadata extraction</Text>
+            <Text style={styles.feature}>✓ Price tracking & alerts</Text>
+            <Text style={styles.feature}>✓ Item claiming notifications</Text>
+            <Text style={styles.feature}>✓ Advanced list customization</Text>
             <Text style={styles.feature}>✓ Priority support</Text>
-            <Text style={styles.feature}>✓ Ad-free experience</Text>
           </View>
 
           <TouchableOpacity
