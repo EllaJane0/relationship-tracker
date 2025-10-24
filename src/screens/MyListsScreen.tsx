@@ -104,8 +104,15 @@ export function MyListsScreen() {
           </View>
           <TouchableOpacity
             onPress={(e) => {
-              e.stopPropagation();
+              if (e && e.stopPropagation) {
+                e.stopPropagation();
+              }
               handleDelete(item.id, item.title);
+            }}
+            onPressIn={(e) => {
+              if (e && e.stopPropagation) {
+                e.stopPropagation();
+              }
             }}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -135,24 +142,14 @@ export function MyListsScreen() {
 
   if (loading && lists.length === 0) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <LoadingIndicator />
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Lists</Text>
-        <TouchableOpacity
-          style={styles.createButton}
-          onPress={() => navigation.navigate('CreateList')}
-        >
-          <Ionicons name="add-circle" size={28} color={theme.colors.primary} />
-        </TouchableOpacity>
-      </View>
-
+    <View style={styles.container}>
       {error && <ErrorMessage message={error} />}
 
       <FlatList
@@ -168,7 +165,7 @@ export function MyListsScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -176,22 +173,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-  },
-  headerTitle: {
-    ...theme.typography.title,
-    fontSize: 28,
-  },
-  createButton: {
-    padding: theme.spacing.xs,
   },
   listContainer: {
     padding: theme.spacing.md,

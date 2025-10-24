@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.xl,
   },
   signOutButton: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: theme.colors.accent,
     borderRadius: theme.borderRadius.md,
     padding: theme.spacing.md,
     marginTop: theme.spacing.md,
