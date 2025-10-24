@@ -155,31 +155,15 @@ function extractTag(html: string, tag: string): string | null {
  */
 function extractAmazonPrice(html: string): number | null {
   try {
-    // Try priceblock_ourprice
-    let priceRegex = /<span[^>]*id=["']priceblock_ourprice["'][^>]*>.*?\$?(\d+\.?\d*)<\/span>/i;
+    // Try a-price-whole and a-price-fraction together (most common current format)
+    let priceRegex = /<span[^>]*class=["'][^"']*a-price-whole[^"']*["'][^>]*>(\d+)<\/span><span[^>]*class=["'][^"']*a-price-fraction[^"']*["'][^>]*>(\d+)<\/span>/i;
     let match = html.match(priceRegex);
-    if (match && match[1]) {
-      const price = parseFloat(match[1]);
+    if (match && match[1] && match[2]) {
+      const price = parseFloat(`${match[1]}.${match[2]}`);
       if (!isNaN(price) && price > 0) return price;
     }
 
-    // Try priceblock_dealprice
-    priceRegex = /<span[^>]*id=["']priceblock_dealprice["'][^>]*>.*?\$?(\d+\.?\d*)<\/span>/i;
-    match = html.match(priceRegex);
-    if (match && match[1]) {
-      const price = parseFloat(match[1]);
-      if (!isNaN(price) && price > 0) return price;
-    }
-
-    // Try price_inside_buybox
-    priceRegex = /<span[^>]*id=["']price_inside_buybox["'][^>]*>.*?\$?(\d+\.?\d*)<\/span>/i;
-    match = html.match(priceRegex);
-    if (match && match[1]) {
-      const price = parseFloat(match[1]);
-      if (!isNaN(price) && price > 0) return price;
-    }
-
-    // Try corePriceDisplay_desktop_feature_div
+    // Try a-price-whole alone (for whole dollar amounts)
     priceRegex = /<span[^>]*class=["'][^"']*a-price-whole[^"']*["'][^>]*>(\d+)<\/span>/i;
     match = html.match(priceRegex);
     if (match && match[1]) {
@@ -187,12 +171,51 @@ function extractAmazonPrice(html: string): number | null {
       if (!isNaN(price) && price > 0) return price;
     }
 
-    // Try to find price in data attributes or JSON
-    const dataRegex = /"price"\s*:\s*"?\$?(\d+\.?\d*)"/i;
-    match = html.match(dataRegex);
+    // Try priceblock_ourprice
+    priceRegex = /<span[^>]*id=["']priceblock_ourprice["'][^>]*>[^\d]*\$?(\d+\.?\d*)<\/span>/is;
+    match = html.match(priceRegex);
     if (match && match[1]) {
       const price = parseFloat(match[1]);
       if (!isNaN(price) && price > 0) return price;
+    }
+
+    // Try priceblock_dealprice
+    priceRegex = /<span[^>]*id=["']priceblock_dealprice["'][^>]*>[^\d]*\$?(\d+\.?\d*)<\/span>/is;
+    match = html.match(priceRegex);
+    if (match && match[1]) {
+      const price = parseFloat(match[1]);
+      if (!isNaN(price) && price > 0) return price;
+    }
+
+    // Try price_inside_buybox
+    priceRegex = /<span[^>]*id=["']price_inside_buybox["'][^>]*>[^\d]*\$?(\d+\.?\d*)<\/span>/is;
+    match = html.match(priceRegex);
+    if (match && match[1]) {
+      const price = parseFloat(match[1]);
+      if (!isNaN(price) && price > 0) return price;
+    }
+
+    // Try apex_offerDisplay_desktop price pattern
+    priceRegex = /<span[^>]*class=["'][^"']*apexPriceToPay[^"']*["'][^>]*>.*?\$(\d+\.?\d*)<\/span>/is;
+    match = html.match(priceRegex);
+    if (match && match[1]) {
+      const price = parseFloat(match[1]);
+      if (!isNaN(price) && price > 0) return price;
+    }
+
+    // Try to find price in data attributes or JSON (look for various price fields)
+    const dataPatterns = [
+      /"priceAmount"\s*:\s*(\d+\.?\d*)/i,
+      /"price"\s*:\s*"?\$?(\d+\.?\d*)"/i,
+      /"displayPrice"\s*:\s*"?\$?(\d+\.?\d*)"/i,
+    ];
+
+    for (const pattern of dataPatterns) {
+      match = html.match(pattern);
+      if (match && match[1]) {
+        const price = parseFloat(match[1]);
+        if (!isNaN(price) && price > 0) return price;
+      }
     }
 
     return null;
