@@ -3,7 +3,7 @@
  * Top navigation bar with logo, nav links, and user menu
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -17,6 +17,27 @@ export function TopNav() {
   const route = useRoute();
   const { user, signOut } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef<View>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    if (Platform.OS === 'web' && showUserMenu) {
+      const handleClickOutside = (event: any) => {
+        // Close menu when clicking anywhere on the page
+        setShowUserMenu(false);
+      };
+
+      // Add event listener with a small delay to prevent immediate closing
+      const timeoutId = setTimeout(() => {
+        document.addEventListener('click', handleClickOutside);
+      }, 100);
+
+      return () => {
+        clearTimeout(timeoutId);
+        document.removeEventListener('click', handleClickOutside);
+      };
+    }
+  }, [showUserMenu]);
 
   const isActive = (routeName: string) => {
     return route.name === routeName;
@@ -84,52 +105,44 @@ export function TopNav() {
           </TouchableOpacity>
 
           {showUserMenu && (
-            <>
-              {/* Backdrop to close menu when clicking outside */}
-              <TouchableOpacity
-                style={styles.menuBackdrop}
-                onPress={() => setShowUserMenu(false)}
-                activeOpacity={1}
-              />
-              <View style={styles.userMenu}>
-                <View style={styles.userMenuHeader}>
-                  <Text style={styles.userEmail}>{user?.email}</Text>
-                </View>
-                <TouchableOpacity
-                  style={styles.userMenuItem}
-                  onPress={() => {
-                    setShowUserMenu(false);
-                    navigation.navigate('Settings');
-                  }}
-                >
-                  <Ionicons name="settings-outline" size={20} color={theme.colors.text} />
-                  <Text style={styles.userMenuItemText}>Settings</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.userMenuItem}
-                  onPress={() => {
-                    setShowUserMenu(false);
-                    (navigation as any).navigate('Subscription');
-                  }}
-                >
-                  <Ionicons name="gift-outline" size={20} color={theme.colors.gold} />
-                  <Text style={styles.userMenuItemText}>Upgrade to Pro</Text>
-                </TouchableOpacity>
-                <View style={styles.userMenuDivider} />
-                <TouchableOpacity
-                  style={styles.userMenuItem}
-                  onPress={() => {
-                    setShowUserMenu(false);
-                    signOut();
-                  }}
-                >
-                  <Ionicons name="log-out-outline" size={20} color={theme.colors.accent} />
-                  <Text style={[styles.userMenuItemText, { color: theme.colors.accent }]}>
-                    Sign Out
-                  </Text>
-                </TouchableOpacity>
+            <View style={styles.userMenu} ref={menuRef}>
+              <View style={styles.userMenuHeader}>
+                <Text style={styles.userEmail}>{user?.email}</Text>
               </View>
-            </>
+              <TouchableOpacity
+                style={styles.userMenuItem}
+                onPress={() => {
+                  setShowUserMenu(false);
+                  navigation.navigate('Settings');
+                }}
+              >
+                <Ionicons name="settings-outline" size={20} color={theme.colors.text} />
+                <Text style={styles.userMenuItemText}>Settings</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.userMenuItem}
+                onPress={() => {
+                  setShowUserMenu(false);
+                  (navigation as any).navigate('Subscription');
+                }}
+              >
+                <Ionicons name="gift-outline" size={20} color={theme.colors.gold} />
+                <Text style={styles.userMenuItemText}>Upgrade to Pro</Text>
+              </TouchableOpacity>
+              <View style={styles.userMenuDivider} />
+              <TouchableOpacity
+                style={styles.userMenuItem}
+                onPress={() => {
+                  setShowUserMenu(false);
+                  signOut();
+                }}
+              >
+                <Ionicons name="log-out-outline" size={20} color={theme.colors.accent} />
+                <Text style={[styles.userMenuItemText, { color: theme.colors.accent }]}>
+                  Sign Out
+                </Text>
+              </TouchableOpacity>
+            </View>
           )}
         </View>
       </View>
@@ -216,14 +229,6 @@ const styles = StyleSheet.create({
   },
   userButton: {
     padding: theme.spacing.xs,
-  },
-  menuBackdrop: {
-    position: 'fixed' as any,
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 999,
   },
   userMenu: {
     position: 'absolute',
