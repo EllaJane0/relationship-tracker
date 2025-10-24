@@ -149,6 +149,59 @@ function extractTag(html: string, tag: string): string | null {
 }
 
 /**
+ * Extract Amazon-specific price
+ * @param html - HTML content to parse
+ * @returns Price as number or null
+ */
+function extractAmazonPrice(html: string): number | null {
+  try {
+    // Try priceblock_ourprice
+    let priceRegex = /<span[^>]*id=["']priceblock_ourprice["'][^>]*>.*?\$?(\d+\.?\d*)<\/span>/i;
+    let match = html.match(priceRegex);
+    if (match && match[1]) {
+      const price = parseFloat(match[1]);
+      if (!isNaN(price) && price > 0) return price;
+    }
+
+    // Try priceblock_dealprice
+    priceRegex = /<span[^>]*id=["']priceblock_dealprice["'][^>]*>.*?\$?(\d+\.?\d*)<\/span>/i;
+    match = html.match(priceRegex);
+    if (match && match[1]) {
+      const price = parseFloat(match[1]);
+      if (!isNaN(price) && price > 0) return price;
+    }
+
+    // Try price_inside_buybox
+    priceRegex = /<span[^>]*id=["']price_inside_buybox["'][^>]*>.*?\$?(\d+\.?\d*)<\/span>/i;
+    match = html.match(priceRegex);
+    if (match && match[1]) {
+      const price = parseFloat(match[1]);
+      if (!isNaN(price) && price > 0) return price;
+    }
+
+    // Try corePriceDisplay_desktop_feature_div
+    priceRegex = /<span[^>]*class=["'][^"']*a-price-whole[^"']*["'][^>]*>(\d+)<\/span>/i;
+    match = html.match(priceRegex);
+    if (match && match[1]) {
+      const price = parseFloat(match[1]);
+      if (!isNaN(price) && price > 0) return price;
+    }
+
+    // Try to find price in data attributes or JSON
+    const dataRegex = /"price"\s*:\s*"?\$?(\d+\.?\d*)"/i;
+    match = html.match(dataRegex);
+    if (match && match[1]) {
+      const price = parseFloat(match[1]);
+      if (!isNaN(price) && price > 0) return price;
+    }
+
+    return null;
+  } catch (error) {
+    return null;
+  }
+}
+
+/**
  * Extract price from schema.org structured data or common patterns
  * @param html - HTML content to parse
  * @returns Extracted price as number or null
@@ -276,11 +329,13 @@ export default async function handler(
     // Extract metadata from HTML with Amazon-specific handling
     let title = null;
     let imageUrl = null;
+    let price = null;
 
     if (isAmazon) {
       // Try Amazon-specific extraction first
       title = extractAmazonTitle(html);
       imageUrl = extractAmazonImage(html);
+      price = extractAmazonPrice(html);
     }
 
     // Fall back to general extraction if Amazon-specific failed
@@ -290,11 +345,14 @@ export default async function handler(
     if (!imageUrl) {
       imageUrl = extractOGTag(html, 'og:image');
     }
+    if (price === null) {
+      price = extractPrice(html);
+    }
 
     const metadata = {
       title,
       imageUrl,
-      price: extractPrice(html),
+      price,
       description: extractOGTag(html, 'og:description') || extractTag(html, 'meta[name="description"]'),
     };
 
