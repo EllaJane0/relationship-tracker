@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   Alert,
   RefreshControl,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -65,25 +66,41 @@ export function MyListsScreen() {
 
   // Handle delete list
   const handleDelete = (listId: string, title: string) => {
-    Alert.alert(
-      'Delete List',
-      `Are you sure you want to delete "${title}"? This action cannot be undone.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await listService.deleteList(listId);
-              setLists(prev => prev.filter(list => list.id !== listId));
-            } catch (err: any) {
-              Alert.alert('Error', err.message || 'Failed to delete list');
-            }
+    console.log('Delete list clicked:', listId, title);
+
+    // Use window.confirm for web compatibility
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`);
+      if (confirmed) {
+        listService.deleteList(listId)
+          .then(() => {
+            setLists(prev => prev.filter(list => list.id !== listId));
+          })
+          .catch(err => {
+            alert(err.message || 'Failed to delete list');
+          });
+      }
+    } else {
+      Alert.alert(
+        'Delete List',
+        `Are you sure you want to delete "${title}"? This action cannot be undone.`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                await listService.deleteList(listId);
+                setLists(prev => prev.filter(list => list.id !== listId));
+              } catch (err: any) {
+                Alert.alert('Error', err.message || 'Failed to delete list');
+              }
+            },
           },
-        },
-      ]
-    );
+        ]
+      );
+    }
   };
 
   // Render individual list item
@@ -91,35 +108,27 @@ export function MyListsScreen() {
     const createdDate = new Date(item.createdAt).toLocaleDateString();
 
     return (
-      <TouchableOpacity
-        style={styles.listCard}
-        onPress={() => navigation.navigate('EditList', { listId: item.id })}
-      >
-        <View style={styles.listCardContent}>
+      <View style={styles.listCard}>
+        <TouchableOpacity
+          style={styles.listCardContent}
+          onPress={() => navigation.navigate('EditList', { listId: item.id })}
+          activeOpacity={0.7}
+        >
           <View style={styles.listInfo}>
             <Text style={styles.listTitle}>{item.title}</Text>
             <Text style={styles.listMeta}>
               {item.itemCount} {item.itemCount === 1 ? 'item' : 'items'} • Created {createdDate}
             </Text>
           </View>
-          <TouchableOpacity
-            onPress={(e) => {
-              if (e && e.stopPropagation) {
-                e.stopPropagation();
-              }
-              handleDelete(item.id, item.title);
-            }}
-            onPressIn={(e) => {
-              if (e && e.stopPropagation) {
-                e.stopPropagation();
-              }
-            }}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Ionicons name="trash-outline" size={22} color={theme.colors.error} />
-          </TouchableOpacity>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => handleDelete(item.id, item.title)}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="trash-outline" size={22} color={theme.colors.error} />
+        </TouchableOpacity>
+      </View>
     );
   };
 
@@ -185,11 +194,14 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.lg,
     marginBottom: theme.spacing.md,
     ...theme.shadows.small,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   listCardContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flex: 1,
+    padding: theme.spacing.md,
+  },
+  deleteButton: {
     padding: theme.spacing.md,
   },
   listInfo: {

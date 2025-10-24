@@ -95,24 +95,36 @@ export function EditListScreen() {
 
   // Handle deleting an item
   const handleDeleteItem = (itemId: string, title: string | null) => {
-    Alert.alert(
-      'Delete Item',
-      `Remove "${title || 'this item'}" from your list?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteItem(itemId);
-            } catch (err: any) {
-              Alert.alert('Error', err.message || 'Failed to delete item');
-            }
+    console.log('Delete item clicked:', itemId, title);
+
+    // Use window.confirm for web compatibility
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm(`Remove "${title || 'this item'}" from your list?`);
+      if (confirmed) {
+        deleteItem(itemId).catch(err => {
+          alert(err.message || 'Failed to delete item');
+        });
+      }
+    } else {
+      Alert.alert(
+        'Delete Item',
+        `Remove "${title || 'this item'}" from your list?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                await deleteItem(itemId);
+              } catch (err: any) {
+                Alert.alert('Error', err.message || 'Failed to delete item');
+              }
+            },
           },
-        },
-      ]
-    );
+        ]
+      );
+    }
   };
 
   // Handle updating item notes/details with debouncing
