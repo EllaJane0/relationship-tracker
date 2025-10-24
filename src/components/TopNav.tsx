@@ -84,44 +84,52 @@ export function TopNav() {
           </TouchableOpacity>
 
           {showUserMenu && (
-            <View style={styles.userMenu}>
-              <View style={styles.userMenuHeader}>
-                <Text style={styles.userEmail}>{user?.email}</Text>
+            <>
+              {/* Backdrop to close menu when clicking outside */}
+              <TouchableOpacity
+                style={styles.menuBackdrop}
+                onPress={() => setShowUserMenu(false)}
+                activeOpacity={1}
+              />
+              <View style={styles.userMenu}>
+                <View style={styles.userMenuHeader}>
+                  <Text style={styles.userEmail}>{user?.email}</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.userMenuItem}
+                  onPress={() => {
+                    setShowUserMenu(false);
+                    navigation.navigate('Settings');
+                  }}
+                >
+                  <Ionicons name="settings-outline" size={20} color={theme.colors.text} />
+                  <Text style={styles.userMenuItemText}>Settings</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.userMenuItem}
+                  onPress={() => {
+                    setShowUserMenu(false);
+                    (navigation as any).navigate('Subscription');
+                  }}
+                >
+                  <Ionicons name="gift-outline" size={20} color={theme.colors.gold} />
+                  <Text style={styles.userMenuItemText}>Upgrade to Pro</Text>
+                </TouchableOpacity>
+                <View style={styles.userMenuDivider} />
+                <TouchableOpacity
+                  style={styles.userMenuItem}
+                  onPress={() => {
+                    setShowUserMenu(false);
+                    signOut();
+                  }}
+                >
+                  <Ionicons name="log-out-outline" size={20} color={theme.colors.accent} />
+                  <Text style={[styles.userMenuItemText, { color: theme.colors.accent }]}>
+                    Sign Out
+                  </Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                style={styles.userMenuItem}
-                onPress={() => {
-                  setShowUserMenu(false);
-                  navigation.navigate('Settings');
-                }}
-              >
-                <Ionicons name="settings-outline" size={20} color={theme.colors.text} />
-                <Text style={styles.userMenuItemText}>Settings</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.userMenuItem}
-                onPress={() => {
-                  setShowUserMenu(false);
-                  (navigation as any).navigate('Subscription');
-                }}
-              >
-                <Ionicons name="gift-outline" size={20} color={theme.colors.gold} />
-                <Text style={styles.userMenuItemText}>Upgrade to Pro</Text>
-              </TouchableOpacity>
-              <View style={styles.userMenuDivider} />
-              <TouchableOpacity
-                style={styles.userMenuItem}
-                onPress={() => {
-                  setShowUserMenu(false);
-                  signOut();
-                }}
-              >
-                <Ionicons name="log-out-outline" size={20} color={theme.colors.accent} />
-                <Text style={[styles.userMenuItemText, { color: theme.colors.accent }]}>
-                  Sign Out
-                </Text>
-              </TouchableOpacity>
-            </View>
+            </>
           )}
         </View>
       </View>
@@ -209,6 +217,14 @@ const styles = StyleSheet.create({
   userButton: {
     padding: theme.spacing.xs,
   },
+  menuBackdrop: {
+    position: 'fixed' as any,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 999,
+  },
   userMenu: {
     position: 'absolute',
     top: 50,
@@ -220,6 +236,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.border,
     zIndex: 1000,
+    overflow: 'hidden',
   },
   userMenuHeader: {
     padding: theme.spacing.md,
@@ -235,6 +252,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: theme.spacing.sm,
     padding: theme.spacing.md,
+    cursor: 'pointer' as any,
+    transition: 'background-color 0.2s' as any,
   },
   userMenuItemText: {
     ...theme.typography.body,
