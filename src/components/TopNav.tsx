@@ -3,41 +3,17 @@
  * Top navigation bar with logo, nav links, and user menu
  */
 
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NavigationProp } from '@react-navigation/native';
 import { theme } from '../styles/theme';
-import { useAuth } from '../contexts/AuthContext';
 import type { MainStackParamList } from '../types/navigation';
 
 export function TopNav() {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
   const route = useRoute();
-  const { user, signOut } = useAuth();
-  const [showUserMenu, setShowUserMenu] = useState(false);
-  const menuRef = useRef<View>(null);
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    if (Platform.OS === 'web' && showUserMenu) {
-      const handleClickOutside = (event: any) => {
-        // Close menu when clicking anywhere on the page
-        setShowUserMenu(false);
-      };
-
-      // Add event listener with a small delay to prevent immediate closing
-      const timeoutId = setTimeout(() => {
-        document.addEventListener('click', handleClickOutside);
-      }, 100);
-
-      return () => {
-        clearTimeout(timeoutId);
-        document.removeEventListener('click', handleClickOutside);
-      };
-    }
-  }, [showUserMenu]);
 
   const isActive = (routeName: string) => {
     return route.name === routeName;
@@ -87,7 +63,7 @@ export function TopNav() {
           ))}
         </View>
 
-        {/* User Menu */}
+        {/* User Actions */}
         <View style={styles.userSection}>
           <TouchableOpacity
             style={styles.createButton}
@@ -98,52 +74,12 @@ export function TopNav() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.userButton}
-            onPress={() => setShowUserMenu(!showUserMenu)}
+            style={styles.settingsButton}
+            onPress={() => navigation.navigate('Settings')}
           >
-            <Ionicons name="person-circle" size={32} color={theme.colors.accent} />
+            <Ionicons name="settings-outline" size={24} color={theme.colors.accent} />
+            <Text style={styles.settingsButtonText}>Settings</Text>
           </TouchableOpacity>
-
-          {showUserMenu && (
-            <View style={styles.userMenu} ref={menuRef}>
-              <View style={styles.userMenuHeader}>
-                <Text style={styles.userEmail}>{user?.email}</Text>
-              </View>
-              <TouchableOpacity
-                style={styles.userMenuItem}
-                onPress={() => {
-                  setShowUserMenu(false);
-                  navigation.navigate('Settings');
-                }}
-              >
-                <Ionicons name="settings-outline" size={20} color={theme.colors.text} />
-                <Text style={styles.userMenuItemText}>Settings</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.userMenuItem}
-                onPress={() => {
-                  setShowUserMenu(false);
-                  (navigation as any).navigate('Subscription');
-                }}
-              >
-                <Ionicons name="gift-outline" size={20} color={theme.colors.gold} />
-                <Text style={styles.userMenuItemText}>Upgrade to Pro</Text>
-              </TouchableOpacity>
-              <View style={styles.userMenuDivider} />
-              <TouchableOpacity
-                style={styles.userMenuItem}
-                onPress={() => {
-                  setShowUserMenu(false);
-                  signOut();
-                }}
-              >
-                <Ionicons name="log-out-outline" size={20} color={theme.colors.accent} />
-                <Text style={[styles.userMenuItemText, { color: theme.colors.accent }]}>
-                  Sign Out
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
         </View>
       </View>
     </View>
@@ -227,46 +163,19 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '600',
   },
-  userButton: {
-    padding: theme.spacing.xs,
-  },
-  userMenu: {
-    position: 'absolute',
-    top: 50,
-    right: 0,
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: theme.borderRadius.md,
-    ...theme.shadows.medium,
-    minWidth: 250,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    zIndex: 1000,
-    overflow: 'hidden',
-  },
-  userMenuHeader: {
-    padding: theme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-  },
-  userEmail: {
-    ...theme.typography.caption,
-    color: theme.colors.textSecondary,
-  },
-  userMenuItem: {
+  settingsButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-    padding: theme.spacing.md,
-    cursor: 'pointer' as any,
-    transition: 'background-color 0.2s' as any,
+    gap: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
   },
-  userMenuItemText: {
+  settingsButtonText: {
     ...theme.typography.body,
-    color: theme.colors.text,
-  },
-  userMenuDivider: {
-    height: 1,
-    backgroundColor: theme.colors.border,
-    marginVertical: theme.spacing.xs,
+    color: theme.colors.accent,
+    fontWeight: '600',
   },
 });
